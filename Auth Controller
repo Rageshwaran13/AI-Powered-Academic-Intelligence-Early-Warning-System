@@ -1,0 +1,37 @@
+package com.edusense.controller;
+
+import com.edusense.model.User;
+import com.edusense.repository.UserRepository;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
+public class AuthController {
+
+    private final UserRepository users;
+
+    public AuthController(UserRepository users) {
+        this.users = users;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String password = request.get("password");
+
+        return users.findByEmail(email)
+                .filter(u -> u.getPassword().equals(password))
+                .<ResponseEntity<?>>map(u -> ResponseEntity.ok(Map.of(
+                        "message", "Login successful",
+                        "userId", u.getId(),
+                        "name", u.getName(),
+                        "email", u.getEmail(),
+                        "role", u.getRole().toString()
+                )))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "Invalid email or password")));
+    }
+}
