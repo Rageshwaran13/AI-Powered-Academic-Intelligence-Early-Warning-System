@@ -1,0 +1,44 @@
+package com.edusense.config;
+
+import com.edusense.model.*;
+import com.edusense.repository.*;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class DataInitializer {
+
+    @Bean
+    CommandLineRunner seed(UserRepository users, StudentRepository students,
+                            CourseRepository courses, AcademicRecordRepository records) {
+        return args -> {
+            if (users.count() > 0) return;
+
+            User studentUser = users.save(new User(
+                    "Arun Kumar", "student@demo.edu", "demo123", Role.STUDENT));
+            User teacherUser = users.save(new User(
+                    "Priya Teacher", "teacher@demo.edu", "demo123", Role.TEACHER));
+            users.save(new User(
+                    "Admin User", "admin@demo.edu", "demo123", Role.ADMIN));
+
+            Student student = students.save(new Student(
+                    studentUser, "24EEE001", "EEE", "IV"));
+
+            Course machines = courses.save(new Course("EE401", "Electrical Machines"));
+            Course control = courses.save(new Course("EE402", "Control Systems"));
+            Course electronics = courses.save(new Course("EE403", "Digital Electronics"));
+            Course power = courses.save(new Course("EE404", "Power Systems"));
+
+            records.save(new AcademicRecord(student, machines, 88, 82, 78, 75));
+            records.save(new AcademicRecord(student, control, 81, 74, 68, 72));
+            records.save(new AcademicRecord(student, electronics, 67, 52, 46, 64));
+            records.save(new AcademicRecord(student, power, 91, 86, 84, 80));
+
+            System.out.println("EduSense AI demo data initialized.");
+            System.out.println("Login: student@demo.edu / demo123");
+            System.out.println("Login: teacher@demo.edu / demo123");
+            System.out.println("Login: admin@demo.edu / demo123");
+        };
+    }
+}
