@@ -1,0 +1,63 @@
+package com.edusense.controller;
+
+import com.edusense.model.*;
+import com.edusense.repository.*;
+import com.edusense.service.AcademicIntelligenceService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.*;
+
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "*")
+public class AcademicController {
+
+    private final AcademicIntelligenceService intelligence;
+    private final StudentRepository students;
+    private final CourseRepository courses;
+    private final AcademicRecordRepository records;
+
+    public AcademicController(AcademicIntelligenceService intelligence,
+                              StudentRepository students,
+                              CourseRepository courses,
+                              AcademicRecordRepository records) {
+        this.intelligence = intelligence;
+        this.students = students;
+        this.courses = courses;
+        this.records = records;
+    }
+
+    @GetMapping("/students")
+    public List<Student> students() {
+        return students.findAll();
+    }
+
+    @GetMapping("/courses")
+    public List<Course> courses() {
+        return courses.findAll();
+    }
+
+    @GetMapping("/students/{id}/records")
+    public List<AcademicRecord> records(@PathVariable Long id) {
+        return records.findByStudentId(id);
+    }
+
+    @GetMapping("/students/{id}/intelligence")
+    public ResponseEntity<?> intelligence(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(intelligence.analyzeStudent(id));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/admin/risk-dashboard")
+    public List<Map<String, Object>> riskDashboard() {
+        return intelligence.analyzeAllStudents();
+    }
+
+    @GetMapping("/health")
+    public Map<String, String> health() {
+        return Map.of("status", "UP", "service", "EduSense AI");
+    }
+}
