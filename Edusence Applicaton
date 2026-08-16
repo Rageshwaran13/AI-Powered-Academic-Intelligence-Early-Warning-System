@@ -1,0 +1,11 @@
+package com.edusense;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class EduSenseApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EduSenseApplication.class, args);
+    }
+}
